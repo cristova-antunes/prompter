@@ -2,7 +2,10 @@ export const role = ["Front-end Developer", "UX Writer", "UI Designer"] as const
 export type Role = (typeof role)[number]
 
 type Prompt = {
-  role: Role
+  role: {
+    role: Role
+    expertize?: string
+  }
   context: string
   prompt: string
 }
@@ -14,10 +17,16 @@ export const promptParts = {
 } as const
 
 function generatePrompt(prompt: Prompt) {
-  return `Act as a ${prompt.role}. Here is the context:
+  return `${promptParts.role[1]} ${prompt.role.role} ${
+    prompt.role.expertize
+      ? `${promptParts.role[1]} ${prompt.role.expertize} ${promptParts.role[2]}`
+      : `${promptParts.role[2]}`
+  }. 
+  
+  ${promptParts.context}
   ${prompt.context}
   
-  Here is the prompt:
+  ${promptParts.prompt}
   ${prompt.prompt}
   `
 }
@@ -27,7 +36,10 @@ function generatePrompt(prompt: Prompt) {
  */
 console.log(
   generatePrompt({
-    role: "Front-end Developer",
+    role: {
+      role: "Front-end Developer",
+      expertize: "CSS Grid",
+    },
     context: "We're building a map component using Google Maps API.",
     prompt:
       "Currently, we have a map component that is not responsive. We need to make it responsive so that it can be used on mobile devices.",

@@ -5,10 +5,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { role as roleList, type Role } from "@/lib/prompt"
+import { promptParts, role as roleList, type Role } from "@/lib/prompt"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
 
 const PromptForm = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -21,10 +22,11 @@ const PromptForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <fieldset>
+    <form onSubmit={handleSubmit} className="grid gap-4">
+      <fieldset className="flex flex-wrap gap-x-1 gap-y-2 items-center">
+        {promptParts.role[0]}
         <Select>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-max">
             <SelectValue placeholder="Role" />
           </SelectTrigger>
           <SelectContent>
@@ -35,19 +37,35 @@ const PromptForm = () => {
             ))}
           </SelectContent>
         </Select>
+        {promptParts.role[1]}
+        <Input />
       </fieldset>
-      <fieldset className="grid w-full max-w-sm items-center gap-3">
-        <Label htmlFor="context">Context</Label>
+      <fieldset className="grid w-full items-center gap-3">
+        <Label htmlFor="context" aria-label="Context">
+          {promptParts.context[0]}
+        </Label>
         <Input
           type="text"
           id="context"
           placeholder="Provide some context for the prompt"
         />
       </fieldset>
-      <fieldset className="grid w-full max-w-sm items-center gap-3">
-        <Label htmlFor="prompt">Prompt</Label>
-        <Textarea placeholder="Provide a prompt for the issue" id="prompt" />
+      <fieldset className="grid w-full items-center gap-3">
+        <Label htmlFor="prompt" aria-label="Prompt">
+          {promptParts.prompt[0]}
+        </Label>
+        <Textarea
+          placeholder="Provide a prompt for the issue"
+          id="prompt"
+          className="w-full resize-y"
+        />
       </fieldset>
+      <div className="flex justify-end gap-3">
+        <Button type="reset" variant="secondary">
+          Reset
+        </Button>
+        <Button>Create</Button>
+      </div>
     </form>
   )
 }

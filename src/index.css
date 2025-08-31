@@ -118,3 +118,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+@utility w-container-responsive {
+  width: min(var(--container-3xl), calc(100vw - calc(var(--spacing) * 4)));
+}
