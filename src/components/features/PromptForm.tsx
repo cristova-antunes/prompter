@@ -10,6 +10,7 @@ import {
 } from "@/components/features/ComboBoxWithCreate"
 import { toast } from "sonner"
 import { Checkbox } from "../ui/checkbox"
+import Snippets from "./Snippets"
 
 const defaultOptions: ComboboxOptions[] = roleList.map((role) => {
   return {
@@ -43,17 +44,19 @@ const PromptForm = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
-    const roleExpertize = formData.get("role-expertize") as string
+    const roleExpertise = formData.get("role-expertise") as string
     const context = formData.get("context") as string
+    const constraints = formData.get("constraints") as string
     const task = formData.get("task") as string
 
     const output = generatePrompt({
       role: {
         role: selectedRole?.value || "",
-        expertize: roleExpertize,
+        expertise: roleExpertise,
       },
       context,
       task,
+      constraints,
       enableChainOfThought: chainOfThoughtSelected,
     })
 
@@ -72,7 +75,7 @@ const PromptForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4" id="prompt-form">
+    <form onSubmit={handleSubmit} className="grid gap-6" id="prompt-form">
       <fieldset className="flex flex-wrap gap-x-1 gap-y-2 items-center">
         {promptParts.role[0]}
         <Combobox
@@ -85,10 +88,21 @@ const PromptForm = () => {
         />
         {promptParts.role[1]}
         <Input
-          id="role-expertize"
-          name="role-expertize"
+          id="role-expertise"
+          name="role-expertise"
           type="text"
-          placeholder="e.g. accessibility, CSS Grid, Intersection Observer, Figma, (...)"
+          placeholder="e.g. Accessibility, CSS Grid, Intersection Observer, Figma, (...)"
+        />
+      </fieldset>
+      <fieldset className="grid w-full items-center gap-3">
+        <Label htmlFor="goal" aria-label="Goal">
+          {promptParts.goal[0]}
+        </Label>
+        <Input
+          type="text"
+          id="goal"
+          name="goal"
+          placeholder="e.g., Create an User-story, Debug an error, (...)"
         />
       </fieldset>
       <fieldset className="grid w-full items-center gap-3">
@@ -110,6 +124,19 @@ const PromptForm = () => {
           placeholder="e.g., Suggest a better user flow for the checkout process., Write a user story for the new mobile app feature."
           id="task"
           name="task"
+          required
+          className="w-full resize-y"
+        />
+      </fieldset>
+      <fieldset className="grid w-full items-center gap-3">
+        <Label htmlFor="constraints" aria-label="Constraints">
+          {promptParts.constraints[0]}
+        </Label>
+        <Textarea
+          placeholder="e.g., Use only typescript, Focus on accessibility (WCAG 2.1)., The solution must be responsive for mobile."
+          id="constraints"
+          name="constraints"
+          required
           className="w-full resize-y"
         />
       </fieldset>
@@ -125,6 +152,7 @@ const PromptForm = () => {
         </div>
       </fieldset>
       <div className="flex justify-end gap-3 sticky bg-card p-3 rounded-sm -bottom-4">
+        <Snippets />
         <Button type="reset" variant="secondary">
           Reset
         </Button>
