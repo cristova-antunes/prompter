@@ -50,6 +50,7 @@ ${prompt.constraints}.`
 
   const output = `
 ${promptParts.role[0]} ${prompt.role.role}${expertiseStr}
+
 ${goalStr}
        
 ${promptParts.context}
@@ -57,7 +58,9 @@ ${prompt.context}.
   
 ${promptParts.task}
 ${prompt.task} 
+
 ${constraintsStr}
+
 ${prompt.enableChainOfThought ? promptParts.chainOfThought[0] : ""}`
 
   return output.trim()

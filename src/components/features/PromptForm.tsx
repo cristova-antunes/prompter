@@ -45,6 +45,7 @@ const PromptForm = () => {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
     const roleExpertise = formData.get("role-expertise") as string
+    const goal = formData.get("goal") as string
     const context = formData.get("context") as string
     const constraints = formData.get("constraints") as string
     const task = formData.get("task") as string
@@ -56,6 +57,7 @@ const PromptForm = () => {
       },
       context,
       task,
+      goal,
       constraints,
       enableChainOfThought: chainOfThoughtSelected,
     })
