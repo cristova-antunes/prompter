@@ -3,7 +3,7 @@ export type Role = (typeof role)[number]
 
 type Prompt = {
   role: {
-    role: Role
+    role: string
     expertize?: string
   }
   context: string
@@ -11,23 +11,23 @@ type Prompt = {
 }
 
 export const promptParts = {
-  role: ["Act as a", ". With expertize in", "."],
-  context: ["Here is the context: ", "."],
-  prompt: ["Here is the prompt:", "."],
+  role: ["Act as a", ". With expertize in"],
+  context: ["Here is the context: "],
+  prompt: ["Here is the prompt:"],
 } as const
 
-function generatePrompt(prompt: Prompt) {
-  return `${promptParts.role[1]} ${prompt.role.role} ${
+export function generatePrompt(prompt: Prompt) {
+  return `${promptParts.role[0]} ${prompt.role.role} ${
     prompt.role.expertize
-      ? `${promptParts.role[1]} ${prompt.role.expertize} ${promptParts.role[2]}`
-      : `${promptParts.role[2]}`
+      ? `${promptParts.role[1]} ${prompt.role.expertize}.`
+      : `.`
   }. 
   
   ${promptParts.context}
-  ${prompt.context}
+  ${prompt.context}.
   
   ${promptParts.prompt}
-  ${prompt.prompt}
+  ${prompt.prompt}.
   `
 }
 

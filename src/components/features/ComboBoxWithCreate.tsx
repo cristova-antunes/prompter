@@ -70,8 +70,8 @@ function CommandAddItem({
         }
       }}
       className={cn(
-        "flex w-full text-blue-500 cursor-pointer text-sm px-2 py-1.5 rounded-sm items-center focus:outline-none",
-        "hover:bg-blue-200 focus:!bg-blue-200"
+        "flex w-fit text-popover-foreground cursor-pointer text-sm px-2 py-1.5 rounded-sm items-center focus:outline-none",
+        "hover:bg-accent focus:!bg-accent"
       )}
     >
       <CirclePlus className="mr-2 h-4 w-4" />
@@ -135,14 +135,14 @@ export function Combobox({
               {options.find((item) => item.value === selected)?.label}
             </div>
           ) : (
-            <div className="text-slate-600 mr-auto">
+            <div className="text-muted-foreground mr-auto">
               {placeholder ?? "Select"}
             </div>
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full min-w-[500px] p-0">
+      <PopoverContent className="min-w-fit p-0" align="start">
         <Command
           filter={(value, search) => {
             const v = toHiragana(value.toLocaleLowerCase())
@@ -214,7 +214,7 @@ export function Combobox({
                     "cursor-pointer",
                     // Override CommandItem class name
                     // CommandItemのクラス名を上書き
-                    "focus:!bg-blue-200 hover:!bg-blue-200 aria-selected:bg-transparent"
+                    "focus:!bg-accent hover:!bg-accent aria-selected:bg-transparent"
                   )}
                 >
                   {/* min to avoid the check icon being too small when the option.label is long. */}

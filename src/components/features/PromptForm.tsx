@@ -1,44 +1,74 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { promptParts, role as roleList, type Role } from "@/lib/prompt"
+import { useState } from "react"
+import { generatePrompt, promptParts, role as roleList } from "@/lib/prompt"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import {
+  Combobox,
+  type ComboboxOptions,
+} from "@/components/features/ComboBoxWithCreate"
+
+const defaultOptions: ComboboxOptions[] = roleList.map((role) => {
+  return {
+    value: role,
+    label: role,
+  }
+})
 
 const PromptForm = () => {
+  const [selectedRole, setSelectedRole] = useState<ComboboxOptions>()
+
+  function handleSelect(option: ComboboxOptions) {
+    console.log("handleSelect")
+    console.log(option)
+    setSelectedRole(option)
+  }
+
+  function handleAppendGroup(label: ComboboxOptions["label"]) {
+    const newRole = {
+      value: label,
+      label,
+    }
+    defaultOptions.push(newRole)
+    console.log("handleAppendGroup")
+    console.log(newRole)
+    handleSelect(newRole)
+  }
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
-    const role = formData.get("role") as Role
+    const roleExpertize = formData.get("role-expertize") as string
     const context = formData.get("context") as string
     const prompt = formData.get("prompt") as string
-    console.log(role, context, prompt)
+
+    const output = generatePrompt({
+      role: {
+        role: selectedRole?.value || "",
+        expertize: roleExpertize,
+      },
+      context,
+      prompt,
+    })
+
+    console.log(output)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4">
+    <form onSubmit={handleSubmit} className="grid gap-4" id="prompt-form">
       <fieldset className="flex flex-wrap gap-x-1 gap-y-2 items-center">
         {promptParts.role[0]}
-        <Select>
-          <SelectTrigger className="w-max">
-            <SelectValue placeholder="Role" />
-          </SelectTrigger>
-          <SelectContent>
-            {roleList.map((role) => (
-              <SelectItem key={role} value={role}>
-                {role}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Combobox
+          options={defaultOptions}
+          placeholder="Role"
+          selected={selectedRole?.value ?? ""}
+          onChange={handleSelect}
+          onCreate={handleAppendGroup}
+          className="w-fit"
+        />
         {promptParts.role[1]}
-        <Input />
+        <Input id="role-expertize" name="role-expertize" type="text" />
       </fieldset>
       <fieldset className="grid w-full items-center gap-3">
         <Label htmlFor="context" aria-label="Context">
@@ -47,6 +77,7 @@ const PromptForm = () => {
         <Input
           type="text"
           id="context"
+          name="context"
           placeholder="Provide some context for the prompt"
         />
       </fieldset>
@@ -57,6 +88,7 @@ const PromptForm = () => {
         <Textarea
           placeholder="Provide a prompt for the issue"
           id="prompt"
+          name="prompt"
           className="w-full resize-y"
         />
       </fieldset>
