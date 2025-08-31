@@ -7,6 +7,12 @@ type Prompt = {
   prompt: string
 }
 
+export const promptParts = {
+  role: ["Act as a", ". With expertize in", "."],
+  context: ["Here is the context: ", "."],
+  prompt: ["Here is the prompt:", "."],
+} as const
+
 function generatePrompt(prompt: Prompt) {
   return `Act as a ${prompt.role}. Here is the context:
   ${prompt.context}
