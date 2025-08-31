@@ -1,4 +1,9 @@
-export const role = ["Front-end Developer", "UX Writer", "UI Designer"] as const
+export const role = [
+  "Front-end Developer",
+  "UX Writer",
+  "UI Designer",
+  "Prompt Engineer",
+] as const
 export type Role = (typeof role)[number]
 
 type Prompt = {
@@ -7,41 +12,28 @@ type Prompt = {
     expertize?: string
   }
   context: string
-  prompt: string
+  task: string
 }
 
 export const promptParts = {
-  role: ["Act as a", ". With expertize in"],
+  role: ["I want you to act as a senior ", ". With expertize in"],
   context: ["Here is the context: "],
-  prompt: ["Here is the prompt:"],
+  task: ["Here is the task:"],
 } as const
 
 export function generatePrompt(prompt: Prompt) {
-  return `${promptParts.role[0]} ${prompt.role.role} ${
+  const output = `
+${promptParts.role[0]} ${prompt.role.role}${
     prompt.role.expertize
       ? `${promptParts.role[1]} ${prompt.role.expertize}.`
-      : `.`
-  }. 
+      : "."
+  }
+       
+${promptParts.context}
+${prompt.context}.
   
-  ${promptParts.context}
-  ${prompt.context}.
-  
-  ${promptParts.prompt}
-  ${prompt.prompt}.
-  `
-}
+${promptParts.task}
+${prompt.task}`
 
-/**
- * Demo
- */
-console.log(
-  generatePrompt({
-    role: {
-      role: "Front-end Developer",
-      expertize: "CSS Grid",
-    },
-    context: "We're building a map component using Google Maps API.",
-    prompt:
-      "Currently, we have a map component that is not responsive. We need to make it responsive so that it can be used on mobile devices.",
-  })
-)
+  return output.trim()
+}

@@ -121,4 +121,6 @@
 
 @utility w-container-responsive {
   width: min(var(--container-3xl), calc(100vw - calc(var(--spacing) * 4)));
+  max-height: calc(100vh - calc(var(--spacing) * 4));
+  overflow-y: auto;
 }

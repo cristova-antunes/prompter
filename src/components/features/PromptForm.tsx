@@ -41,7 +41,7 @@ const PromptForm = () => {
     const formData = new FormData(e.target as HTMLFormElement)
     const roleExpertize = formData.get("role-expertize") as string
     const context = formData.get("context") as string
-    const prompt = formData.get("prompt") as string
+    const task = formData.get("task") as string
 
     const output = generatePrompt({
       role: {
@@ -49,7 +49,7 @@ const PromptForm = () => {
         expertize: roleExpertize,
       },
       context,
-      prompt,
+      task,
     })
 
     console.log(output)
@@ -82,17 +82,17 @@ const PromptForm = () => {
         />
       </fieldset>
       <fieldset className="grid w-full items-center gap-3">
-        <Label htmlFor="prompt" aria-label="Prompt">
-          {promptParts.prompt[0]}
+        <Label htmlFor="task" aria-label="Task">
+          {promptParts.task[0]}
         </Label>
         <Textarea
-          placeholder="Provide a prompt for the issue"
-          id="prompt"
-          name="prompt"
+          placeholder="Provide a task for the issue"
+          id="task"
+          name="task"
           className="w-full resize-y"
         />
       </fieldset>
-      <div className="flex justify-end gap-3">
+      <div className="flex justify-end gap-3 sticky bg-card p-3 rounded-sm -bottom-4">
         <Button type="reset" variant="secondary">
           Reset
         </Button>
