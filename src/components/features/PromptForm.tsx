@@ -8,6 +8,8 @@ import {
   Combobox,
   type ComboboxOptions,
 } from "@/components/features/ComboBoxWithCreate"
+import { toast } from "sonner"
+import { Checkbox } from "../ui/checkbox"
 
 const defaultOptions: ComboboxOptions[] = roleList.map((role) => {
   return {
@@ -18,10 +20,10 @@ const defaultOptions: ComboboxOptions[] = roleList.map((role) => {
 
 const PromptForm = () => {
   const [selectedRole, setSelectedRole] = useState<ComboboxOptions>()
+  const [chainOfThoughtSelected, setChainOfThoughtSelected] =
+    useState<boolean>(false)
 
   function handleSelect(option: ComboboxOptions) {
-    console.log("handleSelect")
-    console.log(option)
     setSelectedRole(option)
   }
 
@@ -31,12 +33,14 @@ const PromptForm = () => {
       label,
     }
     defaultOptions.push(newRole)
-    console.log("handleAppendGroup")
-    console.log(newRole)
     handleSelect(newRole)
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCheckedChange = (checked: boolean | "indeterminate") => {
+    setChainOfThoughtSelected(checked === true)
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
     const roleExpertize = formData.get("role-expertize") as string
@@ -50,9 +54,21 @@ const PromptForm = () => {
       },
       context,
       task,
+      enableChainOfThought: chainOfThoughtSelected,
     })
 
-    console.log(output)
+    try {
+      await navigator.clipboard.writeText(output)
+      toast.success("Prompt copied to the clipboard")
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong. Please check logs in your console")
+    }
+
+    console.log(`
+      DEBUG
+      
+      ${output}`)
   }
 
   return (
@@ -68,7 +84,12 @@ const PromptForm = () => {
           className="w-fit"
         />
         {promptParts.role[1]}
-        <Input id="role-expertize" name="role-expertize" type="text" />
+        <Input
+          id="role-expertize"
+          name="role-expertize"
+          type="text"
+          placeholder="e.g. accessibility, CSS Grid, Intersection Observer, Figma, (...)"
+        />
       </fieldset>
       <fieldset className="grid w-full items-center gap-3">
         <Label htmlFor="context" aria-label="Context">
@@ -78,7 +99,7 @@ const PromptForm = () => {
           type="text"
           id="context"
           name="context"
-          placeholder="Provide some context for the prompt"
+          placeholder="e.g., We are building an e-commerce checkout flow, in React typescript with ShadCN as UI library"
         />
       </fieldset>
       <fieldset className="grid w-full items-center gap-3">
@@ -86,17 +107,28 @@ const PromptForm = () => {
           {promptParts.task[0]}
         </Label>
         <Textarea
-          placeholder="Provide a task for the issue"
+          placeholder="e.g., Suggest a better user flow for the checkout process., Write a user story for the new mobile app feature."
           id="task"
           name="task"
           className="w-full resize-y"
         />
       </fieldset>
+      <fieldset className="grid w-full items-center gap-3">
+        <div className="flex items-center gap-3">
+          <Checkbox
+            id="chain-of-thought"
+            name="chain-of-thought"
+            checked={chainOfThoughtSelected}
+            onCheckedChange={handleCheckedChange}
+          />
+          <Label htmlFor="chain-of-thought">Ask to think step by step</Label>
+        </div>
+      </fieldset>
       <div className="flex justify-end gap-3 sticky bg-card p-3 rounded-sm -bottom-4">
         <Button type="reset" variant="secondary">
           Reset
         </Button>
-        <Button>Create</Button>
+        <Button>Generate prompt</Button>
       </div>
     </form>
   )

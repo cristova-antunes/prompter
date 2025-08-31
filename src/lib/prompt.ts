@@ -13,12 +13,14 @@ type Prompt = {
   }
   context: string
   task: string
+  enableChainOfThought?: boolean
 }
 
 export const promptParts = {
-  role: ["I want you to act as a senior ", ". With expertize in"],
-  context: ["Here is the context: "],
-  task: ["Here is the task:"],
+  role: ["I want you to act as a Senior ", ". With expertize in"],
+  context: ["### Context: "],
+  task: ["### Task:"],
+  chainOfThought: ["Lets think step by step."],
 } as const
 
 export function generatePrompt(prompt: Prompt) {
@@ -33,7 +35,8 @@ ${promptParts.context}
 ${prompt.context}.
   
 ${promptParts.task}
-${prompt.task}`
+${prompt.task} 
+${prompt.enableChainOfThought ? promptParts.chainOfThought[0] : ""}`
 
   return output.trim()
 }
