@@ -19,7 +19,7 @@ type Prompt = {
 }
 
 export const promptParts = {
-  role: ["I want you to act as a Senior ", ". With expertise in"],
+  role: ["I want you to act as a Senior", ". With expertise in"],
   goal: ["### Goal"],
   context: ["### Context: "],
   task: ["### Task:"],

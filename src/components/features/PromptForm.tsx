@@ -69,11 +69,6 @@ const PromptForm = () => {
       console.error(error)
       toast.error("Something went wrong. Please check logs in your console")
     }
-
-    console.log(`
-      DEBUG
-      
-      ${output}`)
   }
 
   return (
