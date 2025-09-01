@@ -151,7 +151,7 @@ const PromptForm = () => {
             <FormItem>
               <FormLabel aria-label="Goal">{promptParts.goal[0]}</FormLabel>
               <FormControl>
-                <Input
+                <Textarea
                   placeholder="e.g., Create an User-story, Debug an error, (...)"
                   {...field}
                 />
