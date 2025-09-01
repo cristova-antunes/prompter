@@ -169,7 +169,7 @@ const PromptForm = () => {
                 {promptParts.context[0]}
               </FormLabel>
               <FormControl>
-                <Input
+                <Textarea
                   placeholder="e.g., We are building an e-commerce checkout flow, in React typescript with ShadCN as UI library"
                   {...field}
                 />
