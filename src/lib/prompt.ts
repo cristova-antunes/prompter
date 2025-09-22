@@ -3,65 +3,55 @@ export const role = [
   "UX Writer",
   "UI Designer",
   "Prompt Engineer",
-] as const
-export type Role = (typeof role)[number]
+] as const;
+export type Role = (typeof role)[number];
 
 type Prompt = {
   role: {
-    role: string
-    expertise?: string
-  }
-  goal?: string
-  context: string
-  task: string
-  constraints?: string
-  enableChainOfThought?: boolean
-}
-
-export const promptParts = {
-  role: ["I want you to act as a Senior", ". With expertise in"],
-  goal: ["### Goal"],
-  context: ["### Context: "],
-  task: ["### Task:"],
-  constraints: ["### Constraints:"],
-  chainOfThought: ["Lets think step by step."],
-} as const
+    role: string;
+    expertise?: string;
+  };
+  goal?: string;
+  context: string;
+  instructions: string;
+  constraints?: string;
+  enableChainOfThought?: boolean;
+};
 
 export function generatePrompt(prompt: Prompt) {
   const expertiseStr = `${
     prompt.role.expertise
-      ? `${promptParts.role[1]} ${prompt.role.expertise}.`
+      ? `. With expertise in ${prompt.role.expertise}.`
       : "."
-  }`
+  }`;
+
+  const roleStr = `<role>I want you to act as a Senior ${prompt.role.role}${expertiseStr}</role>`;
 
   const goalStr = `${
-    prompt.goal && prompt.goal !== ""
-      ? `${promptParts.goal[0]} 
-${prompt.goal}.`
-      : ""
-  }`
+    prompt.goal && prompt.goal !== "" ? `<goal>${prompt.goal}</goal>` : ""
+  }`;
 
   const constraintsStr = `${
     prompt.constraints && prompt.constraints !== ""
-      ? `${promptParts.constraints[0]} 
-${prompt.constraints}.`
+      ? `<constraints>${prompt.constraints}</constraints>`
       : ""
-  }`
+  }`;
 
   const output = `
-${promptParts.role[0]} ${prompt.role.role}${expertiseStr}
+${roleStr}
 
 ${goalStr}
        
-${promptParts.context}
-${prompt.context}.
+<context>${prompt.context}</context>
+
   
-${promptParts.task}
-${prompt.task} 
+<instructions>${prompt.instructions}</instructions>
 
 ${constraintsStr}
 
-${prompt.enableChainOfThought ? promptParts.chainOfThought[0] : ""}`
+${prompt.enableChainOfThought ? "Lets think step by step." : ""}
+If you don't know the answer, just say "Unknown".
+`;
 
-  return output.trim()
+  return output.trim();
 }

@@ -1,14 +1,14 @@
-import { generatePrompt, promptParts, role as roleList } from "@/lib/prompt"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
+import { generatePrompt, role as roleList } from "@/lib/prompt";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
   Combobox,
   type ComboboxOptions,
-} from "@/components/features/ComboBoxWithCreate"
-import { toast } from "sonner"
-import { Checkbox } from "../ui/checkbox"
-import Snippets from "./Snippets"
+} from "@/components/features/ComboBoxWithCreate";
+import { toast } from "sonner";
+import { Checkbox } from "../ui/checkbox";
+import Snippets from "./Snippets";
 import {
   Form,
   FormControl,
@@ -16,27 +16,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+} from "../ui/form";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const defaultRoleOptions: ComboboxOptions[] = roleList.map((role) => {
   return {
     value: role,
     label: role,
-  }
-})
+  };
+});
 
 const formSchema = z.object({
   role: z.string().min(1, "Role is required"),
   roleExpertise: z.string().optional(),
   goal: z.string().optional(),
   context: z.string().min(1, "Context is required"),
-  task: z.string().min(1, "Task is required"),
+  instructions: z.string().min(1, "Task is required"),
   constraints: z.string().optional(),
   enableChainOfThought: z.boolean(),
-})
+});
 
 const PromptForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,13 +46,13 @@ const PromptForm = () => {
       roleExpertise: "",
       goal: "",
       context: "",
-      task: "",
+      instructions: "",
       constraints: "",
       enableChainOfThought: false,
     },
-  })
+  });
 
-  const { setValue } = form
+  const { setValue } = form;
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     const {
@@ -60,10 +60,10 @@ const PromptForm = () => {
       roleExpertise,
       context,
       constraints,
-      task,
+      instructions,
       goal,
       enableChainOfThought,
-    } = data
+    } = data;
 
     const output = generatePrompt({
       role: {
@@ -71,32 +71,32 @@ const PromptForm = () => {
         expertise: roleExpertise,
       },
       context,
-      task,
+      instructions,
       goal,
       constraints,
       enableChainOfThought,
-    })
+    });
 
     try {
-      await navigator.clipboard.writeText(output)
-      toast.success("Prompt copied to the clipboard")
+      await navigator.clipboard.writeText(output);
+      toast.success("Prompt copied to the clipboard");
     } catch (error) {
-      console.error(error)
-      toast.error("Something went wrong. Please check logs in your console")
+      console.error(error);
+      toast.error("Something went wrong. Please check logs in your console");
     }
   }
 
   function handleSelect(option: ComboboxOptions) {
-    setValue("role", option.value)
+    setValue("role", option.value);
   }
 
   function handleAppendGroup(label: ComboboxOptions["label"]) {
     const newRole = {
       value: label,
       label,
-    }
-    defaultRoleOptions.push(newRole)
-    handleSelect(newRole)
+    };
+    defaultRoleOptions.push(newRole);
+    handleSelect(newRole);
   }
 
   return (
@@ -112,7 +112,7 @@ const PromptForm = () => {
             name="role"
             render={({ field, fieldState }) => (
               <FormItem className="contents">
-                {promptParts.role[0]}
+                I want you to act as a Senior
                 <Combobox
                   options={defaultRoleOptions}
                   placeholder="Role"
@@ -123,7 +123,7 @@ const PromptForm = () => {
                     fieldState.error ? "ring ring-destructive" : ""
                   }`}
                 />
-                {promptParts.role[1]}
+                . With expertise in
               </FormItem>
             )}
           />
@@ -149,7 +149,7 @@ const PromptForm = () => {
           name="goal"
           render={({ field }) => (
             <FormItem>
-              <FormLabel aria-label="Goal">{promptParts.goal[0]}</FormLabel>
+              <FormLabel aria-label="Goal">Goal</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="e.g., Create an User-story, Debug an error, (...)"
@@ -165,9 +165,7 @@ const PromptForm = () => {
           name="context"
           render={({ field }) => (
             <FormItem>
-              <FormLabel aria-label="Context">
-                {promptParts.context[0]}
-              </FormLabel>
+              <FormLabel aria-label="Context">Context</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="e.g., We are building an e-commerce checkout flow, in React typescript with ShadCN as UI library"
@@ -180,10 +178,10 @@ const PromptForm = () => {
         />
         <FormField
           control={form.control}
-          name="task"
+          name="instructions"
           render={({ field }) => (
             <FormItem>
-              <FormLabel aria-label="Task">{promptParts.task[0]}</FormLabel>
+              <FormLabel aria-label="Instructions">Instructions</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="e.g., Suggest a better user flow for the checkout process., Write a user story for the new mobile app feature."
@@ -200,9 +198,7 @@ const PromptForm = () => {
           name="constraints"
           render={({ field }) => (
             <FormItem>
-              <FormLabel aria-label="Constraints">
-                {promptParts.constraints[0]}
-              </FormLabel>
+              <FormLabel aria-label="Constraints">Constraints</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="e.g., Use only typescript, Focus on accessibility (WCAG 2.1)., The solution must be responsive for mobile."
@@ -240,7 +236,7 @@ const PromptForm = () => {
         </div>
       </form>
     </Form>
-  )
-}
+  );
+};
 
-export default PromptForm
+export default PromptForm;
