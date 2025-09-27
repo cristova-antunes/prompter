@@ -1,14 +1,14 @@
-import { generatePrompt, role as roleList } from "@/lib/prompt";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { generatePrompt, role as roleList } from "@/lib/prompt"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
 import {
   Combobox,
   type ComboboxOptions,
-} from "@/components/features/ComboBoxWithCreate";
-import { toast } from "sonner";
-import { Checkbox } from "../ui/checkbox";
-import Snippets from "./Snippets";
+} from "@/components/features/ComboBoxWithCreate"
+import { toast } from "sonner"
+import { Checkbox } from "../ui/checkbox"
+import Snippets from "./Snippets"
 import {
   Form,
   FormControl,
@@ -16,27 +16,28 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from "../ui/form"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const defaultRoleOptions: ComboboxOptions[] = roleList.map((role) => {
   return {
     value: role,
     label: role,
-  };
-});
+  }
+})
 
 const formSchema = z.object({
   role: z.string().min(1, "Role is required"),
   roleExpertise: z.string().optional(),
-  goal: z.string().optional(),
   context: z.string().min(1, "Context is required"),
   instructions: z.string().min(1, "Task is required"),
   constraints: z.string().optional(),
+  toneOfVoice: z.string().optional(),
+  format: z.string().optional(),
   enableChainOfThought: z.boolean(),
-});
+})
 
 const PromptForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,15 +45,16 @@ const PromptForm = () => {
     defaultValues: {
       role: "",
       roleExpertise: "",
-      goal: "",
       context: "",
       instructions: "",
       constraints: "",
+      toneOfVoice: "Consistent, informative, professional, avoid jargon",
+      format: "",
       enableChainOfThought: false,
     },
-  });
+  })
 
-  const { setValue } = form;
+  const { setValue } = form
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     const {
@@ -61,9 +63,10 @@ const PromptForm = () => {
       context,
       constraints,
       instructions,
-      goal,
+      toneOfVoice,
+      format,
       enableChainOfThought,
-    } = data;
+    } = data
 
     const output = generatePrompt({
       role: {
@@ -72,31 +75,32 @@ const PromptForm = () => {
       },
       context,
       instructions,
-      goal,
       constraints,
+      toneOfVoice,
+      format,
       enableChainOfThought,
-    });
+    })
 
     try {
-      await navigator.clipboard.writeText(output);
-      toast.success("Prompt copied to the clipboard");
+      await navigator.clipboard.writeText(output)
+      toast.success("Prompt copied to the clipboard")
     } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong. Please check logs in your console");
+      console.error(error)
+      toast.error("Something went wrong. Please check logs in your console")
     }
   }
 
   function handleSelect(option: ComboboxOptions) {
-    setValue("role", option.value);
+    setValue("role", option.value)
   }
 
   function handleAppendGroup(label: ComboboxOptions["label"]) {
     const newRole = {
       value: label,
       label,
-    };
-    defaultRoleOptions.push(newRole);
-    handleSelect(newRole);
+    }
+    defaultRoleOptions.push(newRole)
+    handleSelect(newRole)
   }
 
   return (
@@ -146,22 +150,6 @@ const PromptForm = () => {
 
         <FormField
           control={form.control}
-          name="goal"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel aria-label="Goal">Goal</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="e.g., Create an User-story, Debug an error, (...)"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="context"
           render={({ field }) => (
             <FormItem>
@@ -193,6 +181,40 @@ const PromptForm = () => {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="toneOfVoice"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel aria-label="Tone of Voice">Tone of Voice</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g. Consistent, informative, professional, avoid jargon"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="format"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel aria-label="Format">Format</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g. JSON, Markdown, HTML, (...)"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="constraints"
@@ -236,7 +258,7 @@ const PromptForm = () => {
         </div>
       </form>
     </Form>
-  );
-};
+  )
+}
 
-export default PromptForm;
+export default PromptForm
