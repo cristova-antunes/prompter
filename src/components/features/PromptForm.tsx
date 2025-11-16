@@ -234,6 +234,52 @@ const PromptForm = () => {
           )}
         />
 
+        <div className="flex flex-col gap-3">
+          <h2 className="text-xl font-medium capitalize mb-2">Flags</h2>
+          {Object.entries(flags).map(([category, categoryFlags]) => (
+            <fieldset key={category} className="flex flex-col gap-2">
+              <legend className="text-sm font-medium capitalize mb-2">
+                {category === "promptEngineering"
+                  ? "Prompt Engineering"
+                  : category}
+              </legend>
+              {Object.entries(categoryFlags).map(([flagKey]) => {
+                const fieldName = `flags.${category}.${flagKey}` as
+                  | "flags.general.chainOfThought"
+                  | "flags.general.assumptions"
+                  | "flags.general.options"
+                  | "flags.code.production"
+                  | "flags.code.accessibility"
+                  | "flags.ux.rationale"
+                  | "flags.ux.bestPractices"
+                  | "flags.ux.accessibility"
+                  | "flags.promptEngineering.optimization"
+                return (
+                  <FormField
+                    key={flagKey}
+                    control={form.control}
+                    name={fieldName}
+                    render={({ field }) => (
+                      <FormItem className="flex gap-3">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className="mt-1"
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal">
+                          {categoryFlags[flagKey as keyof typeof categoryFlags]}
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                )
+              })}
+            </fieldset>
+          ))}
+        </div>
+
         <FormField
           control={form.control}
           name="format"
@@ -268,51 +314,6 @@ const PromptForm = () => {
             </FormItem>
           )}
         />
-
-        <div className="flex flex-col gap-3">
-          <h2 className="text-xl font-medium capitalize mb-2">Flags</h2>
-          {Object.entries(flags).map(([category, categoryFlags]) => (
-            <fieldset key={category} className="flex flex-col gap-2">
-              <legend className="text-sm font-medium capitalize mb-2">
-                {category === "promptEngineering"
-                  ? "Prompt Engineering"
-                  : category}
-              </legend>
-              {Object.entries(categoryFlags).map(([flagKey]) => {
-                const fieldName = `flags.${category}.${flagKey}` as
-                  | "flags.general.chainOfThought"
-                  | "flags.general.assumptions"
-                  | "flags.general.options"
-                  | "flags.code.production"
-                  | "flags.code.accessibility"
-                  | "flags.ux.rationale"
-                  | "flags.ux.bestPractices"
-                  | "flags.ux.accessibility"
-                  | "flags.promptEngineering.optimization"
-                return (
-                  <FormField
-                    key={flagKey}
-                    control={form.control}
-                    name={fieldName}
-                    render={({ field }) => (
-                      <FormItem className="flex items-center gap-3">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel className="text-sm font-normal">
-                          {categoryFlags[flagKey as keyof typeof categoryFlags]}
-                        </FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                )
-              })}
-            </fieldset>
-          ))}
-        </div>
 
         <div className="flex justify-end gap-3 sticky bg-card p-3 rounded-sm -bottom-4">
           <Snippets />
