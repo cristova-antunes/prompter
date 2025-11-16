@@ -1,4 +1,4 @@
-import { generatePrompt, role as roleList } from "@/lib/prompt"
+import { flags, generatePrompt, role as roleList } from "@/lib/prompt"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -36,7 +36,25 @@ const formSchema = z.object({
   constraints: z.string().optional(),
   toneOfVoice: z.string().optional(),
   format: z.string().optional(),
-  enableChainOfThought: z.boolean(),
+  flags: z.object({
+    general: z.object({
+      chainOfThought: z.boolean(),
+      assumptions: z.boolean(),
+      options: z.boolean(),
+    }),
+    code: z.object({
+      production: z.boolean(),
+      accessibility: z.boolean(),
+    }),
+    ux: z.object({
+      rationale: z.boolean(),
+      bestPractices: z.boolean(),
+      accessibility: z.boolean(),
+    }),
+    promptEngineering: z.object({
+      optimization: z.boolean(),
+    }),
+  }),
 })
 
 const PromptForm = () => {
@@ -50,7 +68,25 @@ const PromptForm = () => {
       constraints: "",
       toneOfVoice: "Consistent, informative, professional, avoid jargon",
       format: "",
-      enableChainOfThought: false,
+      flags: {
+        general: {
+          chainOfThought: false,
+          assumptions: true,
+          options: true,
+        },
+        code: {
+          production: true,
+          accessibility: true,
+        },
+        ux: {
+          rationale: false,
+          bestPractices: false,
+          accessibility: false,
+        },
+        promptEngineering: {
+          optimization: false,
+        },
+      },
     },
   })
 
@@ -65,7 +101,7 @@ const PromptForm = () => {
       instructions,
       toneOfVoice,
       format,
-      enableChainOfThought,
+      flags,
     } = data
 
     const output = generatePrompt({
@@ -78,7 +114,7 @@ const PromptForm = () => {
       constraints,
       toneOfVoice,
       format,
-      enableChainOfThought,
+      flags,
     })
 
     try {
@@ -232,23 +268,52 @@ const PromptForm = () => {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="enableChainOfThought"
-          render={({ field }) => (
-            <FormItem className="flex items-center gap-3">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <FormLabel className="text-sm font-normal">
-                Ask to think step by step
-              </FormLabel>
-            </FormItem>
-          )}
-        />
+
+        <div className="flex flex-col gap-3">
+          <h2 className="text-xl font-medium capitalize mb-2">Flags</h2>
+          {Object.entries(flags).map(([category, categoryFlags]) => (
+            <fieldset key={category} className="flex flex-col gap-2">
+              <legend className="text-sm font-medium capitalize mb-2">
+                {category === "promptEngineering"
+                  ? "Prompt Engineering"
+                  : category}
+              </legend>
+              {Object.entries(categoryFlags).map(([flagKey]) => {
+                const fieldName = `flags.${category}.${flagKey}` as
+                  | "flags.general.chainOfThought"
+                  | "flags.general.assumptions"
+                  | "flags.general.options"
+                  | "flags.code.production"
+                  | "flags.code.accessibility"
+                  | "flags.ux.rationale"
+                  | "flags.ux.bestPractices"
+                  | "flags.ux.accessibility"
+                  | "flags.promptEngineering.optimization"
+                return (
+                  <FormField
+                    key={flagKey}
+                    control={form.control}
+                    name={fieldName}
+                    render={({ field }) => (
+                      <FormItem className="flex items-center gap-3">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal">
+                          {categoryFlags[flagKey as keyof typeof categoryFlags]}
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                )
+              })}
+            </fieldset>
+          ))}
+        </div>
+
         <div className="flex justify-end gap-3 sticky bg-card p-3 rounded-sm -bottom-4">
           <Snippets />
           <Button type="reset" variant="secondary">
