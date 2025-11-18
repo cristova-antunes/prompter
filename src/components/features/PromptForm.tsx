@@ -298,56 +298,67 @@ const PromptForm = () => {
                   collapsible
                   defaultValue={Object.keys(flags)[0]}
                 >
-                  {Object.entries(flags).map(([category, categoryFlags]) => (
-                    <AccordionItem value={category} key={category}>
-                      <AccordionTrigger className="capitalize">
-                        {category === "promptEngineering"
-                          ? "Prompt Engineering"
-                          : category}
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="grid gap-2">
-                          {Object.entries(categoryFlags).map(([flagKey]) => {
-                            const fieldName = `flags.${category}.${flagKey}` as
-                              | "flags.general.chainOfThought"
-                              | "flags.general.assumptions"
-                              | "flags.general.options"
-                              | "flags.code.production"
-                              | "flags.code.accessibility"
-                              | "flags.ux.rationale"
-                              | "flags.ux.bestPractices"
-                              | "flags.ux.accessibility"
-                              | "flags.promptEngineering.optimization"
-                            return (
-                              <FormField
-                                key={flagKey}
-                                control={form.control}
-                                name={fieldName}
-                                render={({ field }) => (
-                                  <FormItem className="flex gap-3">
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        className="mt-1"
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-sm font-normal">
-                                      {
-                                        categoryFlags[
-                                          flagKey as keyof typeof categoryFlags
-                                        ]
-                                      }
-                                    </FormLabel>
-                                  </FormItem>
-                                )}
-                              />
-                            )
-                          })}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
+                  {Object.entries(flags).map(([categoryKey, categoryObj]) => {
+                    // categoryObj: { label, flags }
+                    // Some categories use 'label', one uses 'labels'.
+                    const label =
+                      "label" in categoryObj
+                        ? categoryObj.label
+                        : "labels" in categoryObj
+                        ? categoryObj.labels
+                        : categoryKey
+                    const flagEntries = Object.entries(categoryObj.flags)
+                    return (
+                      <AccordionItem value={categoryKey} key={categoryKey}>
+                        <AccordionTrigger className="capitalize">
+                          {label}
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="grid gap-2">
+                            {flagEntries.map(([flagKey, flagObj]) => {
+                              // Only allow valid field names for FormField
+                              const validFieldNames = [
+                                "flags.general.chainOfThought",
+                                "flags.general.assumptions",
+                                "flags.general.options",
+                                "flags.code.production",
+                                "flags.code.accessibility",
+                                "flags.ux.rationale",
+                                "flags.ux.bestPractices",
+                                "flags.ux.accessibility",
+                                "flags.promptEngineering.optimization",
+                              ] as const
+                              const fieldName =
+                                `flags.${categoryKey}.${flagKey}` as (typeof validFieldNames)[number]
+                              if (!validFieldNames.includes(fieldName))
+                                return null
+                              return (
+                                <FormField
+                                  key={flagKey}
+                                  control={form.control}
+                                  name={fieldName}
+                                  render={({ field }) => (
+                                    <FormItem className="flex gap-3">
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={!!field.value}
+                                          onCheckedChange={field.onChange}
+                                          className="mt-1"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-sm font-normal">
+                                        {flagObj.label || flagKey}
+                                      </FormLabel>
+                                    </FormItem>
+                                  )}
+                                />
+                              )
+                            })}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    )
+                  })}
                 </Accordion>
               </CardContent>
             </Card>
