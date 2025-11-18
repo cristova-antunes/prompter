@@ -13,7 +13,7 @@ export default function Utilities() {
   return (
     <>
       <H2>Utilities</H2>
-      <div className="grid gap-6 grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         <Card className="p-6">
           <H3>Code block</H3>
           <CodeBlock />
