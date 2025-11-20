@@ -1,4 +1,9 @@
-import { flags, generatePrompt, role as roleList } from "@/lib/prompt"
+import {
+  flags,
+  generateJSONPrompt,
+  generatePrompt,
+  role as roleList,
+} from "@/lib/prompt"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -27,6 +32,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion"
+import { encode } from "@toon-format/toon"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 
 const defaultRoleOptions: ComboboxOptions[] = roleList.map((role) => {
   return {
@@ -34,6 +41,17 @@ const defaultRoleOptions: ComboboxOptions[] = roleList.map((role) => {
     label: role,
   }
 })
+
+const exportOptions = ["xml", "json", "toon"] as const
+
+type ExportMode = (typeof exportOptions)[number]
+
+function isExportMode(value: unknown): value is ExportMode {
+  return (
+    typeof value === "string" &&
+    (exportOptions as readonly string[]).includes(value)
+  )
+}
 
 const formSchema = z.object({
   role: z.string().min(1, "Role is required"),
@@ -63,6 +81,7 @@ const formSchema = z.object({
       optimization: z.boolean(),
     }),
   }),
+  exportMode: z.enum(exportOptions),
 })
 
 const PromptForm = () => {
@@ -96,6 +115,7 @@ const PromptForm = () => {
           optimization: false,
         },
       },
+      exportMode: "json",
     },
   })
 
@@ -111,20 +131,55 @@ const PromptForm = () => {
       toneOfVoice,
       format,
       flags,
+      exportMode,
     } = data
 
-    const output = generatePrompt({
-      role: {
-        role,
-        expertise: roleExpertise,
-      },
-      context,
-      instructions,
-      constraints,
-      toneOfVoice,
-      format,
-      flags,
-    })
+    let output = ""
+
+    if (exportMode === "json") {
+      const data = generateJSONPrompt({
+        role: {
+          role,
+          expertise: roleExpertise,
+        },
+        context,
+        instructions,
+        constraints,
+        toneOfVoice,
+        format,
+        flags,
+      })
+
+      output = JSON.stringify(data, null, 2)
+    } else if (exportMode === "toon") {
+      const data = generateJSONPrompt({
+        role: {
+          role,
+          expertise: roleExpertise,
+        },
+        context,
+        instructions,
+        constraints,
+        toneOfVoice,
+        format,
+        flags,
+      })
+
+      output = encode(data)
+    } else {
+      output = generatePrompt({
+        role: {
+          role,
+          expertise: roleExpertise,
+        },
+        context,
+        instructions,
+        constraints,
+        toneOfVoice,
+        format,
+        flags,
+      })
+    }
 
     try {
       await navigator.clipboard.writeText(output)
@@ -169,6 +224,20 @@ const PromptForm = () => {
         </div>
 
         <div className="flex justify-end gap-3 sticky z-10 bottom-4">
+          <ToggleGroup
+            type="single"
+            defaultValue="json"
+            aria-label="Export Mode"
+            onValueChange={(value) => {
+              if (isExportMode(value)) {
+                setValue("exportMode", value)
+              }
+            }}
+          >
+            <ToggleGroupItem value="json">JSON</ToggleGroupItem>
+            <ToggleGroupItem value="toon">Toon</ToggleGroupItem>
+            <ToggleGroupItem value="xml">XML</ToggleGroupItem>
+          </ToggleGroup>
           <Button type="submit">Generate prompt</Button>
         </div>
       </form>

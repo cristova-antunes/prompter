@@ -169,3 +169,66 @@ ${flagsStr}`
 
   return output.trim()
 }
+
+export function generateJSONPrompt(prompt: Prompt) {
+  // Helper to escape backticks so code blocks inside strings are preserved
+  const escapeBackticks = (s?: string) =>
+    (s ?? "").replace(/```/g, "\\`\\`\\`").replace(/`/g, "\\`")
+
+  const expertiseStr = prompt.role.expertise
+    ? `. With expertise in ${prompt.role.expertise}.`
+    : "."
+
+  const roleStr = `I want you to act as a Senior ${prompt.role.role}${expertiseStr}`
+
+  const flagStrings: string[] = []
+  if (prompt.flags.general.chainOfThought) {
+    flagStrings.push(flags.general.flags.chainOfThought.prompt)
+  }
+  if (prompt.flags.general.assumptions) {
+    flagStrings.push(flags.general.flags.assumptions.prompt)
+  }
+  if (prompt.flags.general.options) {
+    flagStrings.push(flags.general.flags.options.prompt)
+  }
+  if (prompt.flags.code.production) {
+    flagStrings.push(flags.code.flags.production.prompt)
+  }
+  if (prompt.flags.code.accessibility) {
+    flagStrings.push(flags.code.flags.accessibility.prompt)
+  }
+  if (prompt.flags.ux.rationale) {
+    flagStrings.push(flags.ux.flags.rationale.prompt)
+  }
+  if (prompt.flags.ux.bestPractices) {
+    flagStrings.push(flags.ux.flags.bestPractices.prompt)
+  }
+  if (prompt.flags.ux.accessibility) {
+    flagStrings.push(flags.ux.flags.accessibility.prompt)
+  }
+  if (prompt.flags.promptEngineering.optimization) {
+    flagStrings.push(flags.promptEngineering.flags.optimization.prompt)
+  }
+
+  // Build an object where each tag is a key. Flags are returned as an array of strings when present.
+  const output: Record<string, string | string[]> = {
+    role: roleStr,
+    context: escapeBackticks(prompt.context),
+    instructions: escapeBackticks(prompt.instructions),
+    "tone of voice": prompt.toneOfVoice ?? "",
+  }
+
+  if (prompt.constraints && prompt.constraints !== "") {
+    output.constraints = escapeBackticks(prompt.constraints)
+  }
+
+  if (prompt.format && prompt.format !== "") {
+    output.format = prompt.format
+  }
+
+  if (flagStrings.length > 0) {
+    output.flags = flagStrings
+  }
+
+  return output
+}
