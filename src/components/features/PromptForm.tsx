@@ -45,6 +45,7 @@ const defaultRoleOptions: ComboboxOptions[] = roleList.map((role) => {
 const exportOptions = ["xml", "json", "toon"] as const
 
 type ExportMode = (typeof exportOptions)[number]
+const defaultExportMode: ExportMode = "toon"
 
 function isExportMode(value: unknown): value is ExportMode {
   return (
@@ -115,7 +116,7 @@ const PromptForm = () => {
           optimization: false,
         },
       },
-      exportMode: "json",
+      exportMode: defaultExportMode,
     },
   })
 
@@ -223,10 +224,11 @@ const PromptForm = () => {
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 sticky z-10 bottom-4">
+        <div className="flex justify-between gap-3 sticky z-10 bottom-4">
           <ToggleGroup
             type="single"
-            defaultValue="json"
+            className="border"
+            defaultValue={defaultExportMode}
             aria-label="Export Mode"
             onValueChange={(value) => {
               if (isExportMode(value)) {
