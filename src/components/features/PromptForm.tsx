@@ -51,6 +51,7 @@ const formSchema = z.object({
     code: z.object({
       production: z.boolean(),
       accessibility: z.boolean(),
+      onlyReturnCode: z.boolean(),
     }),
     ux: z.object({
       rationale: z.boolean(),
@@ -83,6 +84,7 @@ const PromptForm = () => {
         code: {
           production: true,
           accessibility: true,
+          onlyReturnCode: false,
         },
         ux: {
           rationale: false,
@@ -149,7 +151,7 @@ const PromptForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="rounded-xl shadow-sm p-4 bg-form-foreground"
+        className="rounded-xl shadow-sm p-4 bg-form-foreground grid gap-4 border"
         id="prompt-form"
       >
         <div className="grid gap-6 lg:grid-cols-[1fr_clamp(250px,25vw,360px)] ">
@@ -298,7 +300,7 @@ const PromptForm = () => {
                   </div>
                   <Accordion
                     type="multiple"
-                    defaultValue={[Object.keys(flags)[0]]}
+                    defaultValue={[...Object.keys(flags)]}
                   >
                     {Object.entries(flags).map(([categoryKey, categoryObj]) => {
                       // categoryObj: { label, flags }
@@ -325,6 +327,7 @@ const PromptForm = () => {
                                   "flags.general.options",
                                   "flags.code.production",
                                   "flags.code.accessibility",
+                                  "flags.code.onlyReturnCode",
                                   "flags.ux.rationale",
                                   "flags.ux.bestPractices",
                                   "flags.ux.accessibility",

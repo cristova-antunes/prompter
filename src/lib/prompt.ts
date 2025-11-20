@@ -39,6 +39,11 @@ export const flags = {
         prompt:
           "Ensure all outputs, especially design or front-end code, strictly adhere to WCAG 2.1 AA standards.",
       },
+      onlyReturnCode: {
+        label: "Only return code",
+        prompt:
+          "Give me just the code, no extra explanations or text. But make sure the code is formatted as such.",
+      },
     },
   },
   ux: {
