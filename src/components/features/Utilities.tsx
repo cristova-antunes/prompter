@@ -18,10 +18,10 @@ export default function Utilities() {
           <H3>Code block</H3>
           <CodeBlock />
         </Card>
-        <Card className="p-6">
+        {/* <Card className="p-6">
           <H3>Tag block</H3>
           <TagBlock />
-        </Card>
+        </Card> */}
       </div>
     </>
   )
@@ -112,77 +112,77 @@ ${content}
   )
 }
 
-function TagBlock() {
-  const form = useForm<z.infer<typeof codeSchema>>({
-    resolver: zodResolver(codeSchema),
-    defaultValues: {
-      tag: "",
-      content: "",
-    },
-  })
+// function TagBlock() {
+//   const form = useForm<z.infer<typeof codeSchema>>({
+//     resolver: zodResolver(codeSchema),
+//     defaultValues: {
+//       tag: "",
+//       content: "",
+//     },
+//   })
 
-  async function onSubmit(data: z.infer<typeof codeSchema>) {
-    const { tag, content } = data
+//   async function onSubmit(data: z.infer<typeof codeSchema>) {
+//     const { tag, content } = data
 
-    const output = `<${tag}>
-${content}
-</${tag}>
-`
+//     const output = `<${tag}>
+// ${content}
+// </${tag}>
+// `
 
-    try {
-      await navigator.clipboard.writeText(output)
-      toast.success("Tag block copied to the clipboard")
-    } catch (error) {
-      console.error(error)
-      toast.error("Something went wrong. Please check logs in your console")
-    }
-  }
+//     try {
+//       await navigator.clipboard.writeText(output)
+//       toast.success("Tag block copied to the clipboard")
+//     } catch (error) {
+//       console.error(error)
+//       toast.error("Something went wrong. Please check logs in your console")
+//     }
+//   }
 
-  return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="grid gap-4 grid-rows-[1fr_auto] h-full"
-        id="tag-form"
-      >
-        <div className="flex flex-col gap-4">
-          <FormField
-            control={form.control}
-            name="tag"
-            render={({ field }) => (
-              <FormItem className="contents">
-                <FormControl>
-                  <Input placeholder="article-1" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+//   return (
+//     <Form {...form}>
+//       <form
+//         onSubmit={form.handleSubmit(onSubmit)}
+//         className="grid gap-4 grid-rows-[1fr_auto] h-full"
+//         id="tag-form"
+//       >
+//         <div className="flex flex-col gap-4">
+//           <FormField
+//             control={form.control}
+//             name="tag"
+//             render={({ field }) => (
+//               <FormItem className="contents">
+//                 <FormControl>
+//                   <Input placeholder="article-1" {...field} />
+//                 </FormControl>
+//                 <FormMessage />
+//               </FormItem>
+//             )}
+//           />
 
-          <FormField
-            control={form.control}
-            name="content"
-            render={({ field }) => (
-              <FormItem className="contents">
-                <FormControl>
-                  <Textarea
-                    placeholder={`Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laboriosam modi qui sequi quis at, amet ipsam nemo aut eveniet beatae consectetur asperiores esse quia repudiandae quaerat! Temporibus accusantium voluptate quod!}`}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+//           <FormField
+//             control={form.control}
+//             name="content"
+//             render={({ field }) => (
+//               <FormItem className="contents">
+//                 <FormControl>
+//                   <Textarea
+//                     placeholder={`Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laboriosam modi qui sequi quis at, amet ipsam nemo aut eveniet beatae consectetur asperiores esse quia repudiandae quaerat! Temporibus accusantium voluptate quod!}`}
+//                     {...field}
+//                   />
+//                 </FormControl>
+//                 <FormMessage />
+//               </FormItem>
+//             )}
+//           />
+//         </div>
 
-        <div className="text-right">
-          <Button variant={"link"} type="button" onClick={() => form.reset()}>
-            Reset
-          </Button>
-          <Button type="submit">Create</Button>
-        </div>
-      </form>
-    </Form>
-  )
-}
+//         <div className="text-right">
+//           <Button variant={"link"} type="button" onClick={() => form.reset()}>
+//             Reset
+//           </Button>
+//           <Button type="submit">Create</Button>
+//         </div>
+//       </form>
+//     </Form>
+//   )
+// }
