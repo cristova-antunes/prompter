@@ -57,7 +57,7 @@ const formSchema = z.object({
   role: z.string().min(1, "Role is required"),
   roleExpertise: z.string().optional(),
   context: z.string().min(1, "Context is required"),
-  instructions: z.string().min(1, "Task is required"),
+  task: z.string().min(1, "Task is required"),
   constraints: z.string().optional(),
   toneOfVoice: z.string().optional(),
   format: z.string().optional(),
@@ -91,7 +91,7 @@ const PromptForm = () => {
       role: "",
       roleExpertise: "",
       context: "",
-      instructions: "",
+      task: "",
       constraints: "",
       toneOfVoice: "Consistent, informative, professional, avoid jargon",
       format: "",
@@ -127,7 +127,7 @@ const PromptForm = () => {
       roleExpertise,
       context,
       constraints,
-      instructions,
+      task,
       toneOfVoice,
       format,
       flags,
@@ -143,7 +143,7 @@ const PromptForm = () => {
           expertise: roleExpertise,
         },
         context,
-        instructions,
+        task,
         constraints,
         toneOfVoice,
         format,
@@ -158,7 +158,7 @@ const PromptForm = () => {
           expertise: roleExpertise,
         },
         context,
-        instructions,
+        task,
         constraints,
         toneOfVoice,
         format,
@@ -173,7 +173,7 @@ const PromptForm = () => {
           expertise: roleExpertise,
         },
         context,
-        instructions,
+        task,
         constraints,
         toneOfVoice,
         format,
@@ -315,10 +315,10 @@ function MainFormCard({
           />
           <FormField
             control={form.control}
-            name="instructions"
+            name="task"
             render={({ field }) => (
               <FormItem>
-                <FormLabel aria-label="Instructions">Instructions</FormLabel>
+                <FormLabel aria-label="task">Task</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="e.g., Suggest a better user flow for the checkout process., Write a user story for the new mobile app feature."

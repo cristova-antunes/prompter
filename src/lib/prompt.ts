@@ -18,7 +18,7 @@ export const flags = {
       assumptions: {
         label: "Ask to clarify before answering (if relevant)",
         prompt:
-          "If the provided context or instructions are insufficient or unclear, state the ambiguity and ask for clarification, rather than guessing.",
+          "If the provided context or task are insufficient or unclear, state the ambiguity and ask for clarification, rather than guessing.",
       },
       options: {
         label: "Provide alternatives or options (if relevant)",
@@ -80,7 +80,7 @@ type Prompt = {
     expertise?: string
   }
   context: string
-  instructions: string
+  task: string
   toneOfVoice?: string
   constraints?: string
   format?: string
@@ -161,7 +161,7 @@ export function generatePrompt(prompt: Prompt) {
   const output = `
 ${roleStr}
 <context>${prompt.context}</context>
-<instructions>${prompt.instructions}</instructions>
+<task>${prompt.task}</task>
 ${constraintsStr}
 <tone of voice>${prompt.toneOfVoice}</tone of voice>
 ${formatStr}
@@ -214,7 +214,7 @@ export function generateJSONPrompt(prompt: Prompt) {
   const output: Record<string, string | string[]> = {
     role: roleStr,
     context: escapeBackticks(prompt.context),
-    instructions: escapeBackticks(prompt.instructions),
+    task: escapeBackticks(prompt.task),
     "tone of voice": prompt.toneOfVoice ?? "",
   }
 
