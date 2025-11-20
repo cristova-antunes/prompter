@@ -224,7 +224,7 @@ const PromptForm = () => {
           </div>
         </div>
 
-        <div className="flex justify-between gap-3 sticky z-10 bottom-4">
+        <div className="flex justify-end gap-6 sticky z-10 bottom-4">
           <ToggleGroup
             type="single"
             className="border"
