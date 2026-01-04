@@ -1,69 +1,43 @@
-# React + TypeScript + Vite
+# Prompter 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Prompter** is a small React + Vite tool that helps you create structured, higher-quality prompts through a guided form. Fill the form, toggle optional guidance flags, and export your prompt in multiple formats  including the optimized **Toon** format.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+##  Features
 
-## Expanding the ESLint configuration
+- Guided form to compose prompts with: **role**, **expertise**, **context**, **task**, **constraints**, **tone**, and **format**.
+- Toggleable **flags** (e.g., chain-of-thought, accessibility, production-ready code) to inject best-practice guidance into prompts.
+- **Export modes:** `json`, `toon` (optimized format), and `xml`.
+- One-click copy to clipboard and toast notifications for success/error.
+- Small, extensible codebase with clear places to add roles, flags, and export strategies.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+##  Quick start
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+```bash
+# Install dependencies (recommended: pnpm)
+pnpm install
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Start the dev server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Preview build
+pnpm preview
+
+# Lint the code
+pnpm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+> Tip: You can also use `npm` or `yarn` if you prefer.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🔒 Privacy & Data
+
+Prompter runs entirely in the browser and processes all input locally on the client. No form data or prompts are transmitted to any external server or database by this project. If you add integrations, analytics, or third-party services, verify their privacy practices.
+
