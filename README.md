@@ -1,3 +1,5 @@
+![Prompter preview](https://github.com/cristova-antunes/prompter/blob/main/public/readme.png?raw=true)
+
 # Prompter 
 
 **Prompter** is a small React + Vite tool that helps you create structured, higher-quality prompts through a guided form. Fill the form, toggle optional guidance flags, and export your prompt in multiple formats  including the optimized **Toon** format.
