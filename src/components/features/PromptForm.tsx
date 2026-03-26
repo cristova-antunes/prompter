@@ -130,29 +130,36 @@ const PromptForm = () => {
   const { setValue, getValues } = form
 
   const [speechTarget, setSpeechTarget] = useState<SpeechTarget | null>(null)
+  const speechTargetRef = useRef<SpeechTarget | null>(null)
   const commitRef = useRef(false)
+  const requestedSpeechRef = useRef(false)
 
   const {
     transcript,
+    finalTranscript,
     listening,
     browserSupportsSpeechRecognition,
     resetTranscript,
+    isMicrophoneAvailable,
   } = useSpeechRecognition()
 
   useEffect(() => {
     // Commit when recognition stops (either via the button or automatically).
     if (listening) return
-    if (!speechTarget) return
+    const activeTarget = speechTargetRef.current
+    if (!activeTarget) return
     if (commitRef.current) return
 
-    const spoken = transcript.trim()
+    // `finalTranscript` is the stable, final result from the Web Speech API.
+    // We still fall back to `transcript` because some browsers only emit finals.
+    const spoken = (finalTranscript || transcript).trim()
     if (spoken) {
-      const currentValue = getValues(speechTarget) ?? ""
+      const currentValue = getValues(activeTarget) ?? ""
       const nextValue = currentValue.trim().length
         ? `${currentValue.trimEnd()} ${spoken}`
         : spoken
 
-      setValue(speechTarget, nextValue, {
+      setValue(activeTarget, nextValue, {
         shouldDirty: true,
         shouldValidate: true,
       })
@@ -160,26 +167,59 @@ const PromptForm = () => {
 
     commitRef.current = true
     resetTranscript()
+    speechTargetRef.current = null
+    requestedSpeechRef.current = false
     setSpeechTarget(null)
   }, [
     getValues,
     listening,
+    finalTranscript,
     resetTranscript,
     setSpeechTarget,
     setValue,
-    speechTarget,
     transcript,
   ])
 
+  useEffect(() => {
+    if (!requestedSpeechRef.current) return
+    if (isMicrophoneAvailable === false) {
+      // In production, the browser might block microphone access due to insecure
+      // context (http vs https/localhost) or user denying permission.
+      toast.error(
+        "Microphone is not available. Ensure you’re on HTTPS (or localhost) and microphone permission is granted."
+      )
+      requestedSpeechRef.current = false
+      setSpeechTarget(null)
+      speechTargetRef.current = null
+      commitRef.current = true
+      resetTranscript()
+    }
+  }, [isMicrophoneAvailable, resetTranscript])
+
   function handleStartSpeech(target: SpeechTarget) {
     if (!browserSupportsSpeechRecognition) return
+    requestedSpeechRef.current = true
+
+    // Web Speech API typically requires a secure context (https or localhost).
+    if (typeof window !== "undefined" && !window.isSecureContext) {
+      toast.error(
+        "Speech recognition requires a secure context (HTTPS or localhost)."
+      )
+      requestedSpeechRef.current = false
+      commitRef.current = true
+      return
+    }
 
     commitRef.current = false
     setSpeechTarget(target)
+    speechTargetRef.current = target
     resetTranscript()
     SpeechRecognition.startListening({
       continuous: false,
       language: navigator.language || "en-US",
+    }).catch(() => {
+      // Library swallows some errors; this is just a last resort to avoid silence.
+      toast.error("Could not start speech recognition. Check console for details.")
     })
   }
 
