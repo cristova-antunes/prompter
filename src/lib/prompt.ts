@@ -16,9 +16,9 @@ export const flags = {
           "Think step-by-step, outline your solution process (in detail) and derive the solution step-by-step therefore.",
       },
       assumptions: {
-        label: "Ask to clarify before answering (if relevant)",
+        label: "Ask for clarification before answering (if relevant)",
         prompt:
-          "If the provided context or task are insufficient or unclear, state the ambiguity and ask for clarification, rather than guessing.",
+          "If the provided context or task are insufficient or unclear, ask first for clarification, rather than guessing.",
       },
       options: {
         label: "Provide alternatives or options (if relevant)",

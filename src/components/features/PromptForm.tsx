@@ -4,6 +4,7 @@ import {
   generatePrompt,
   role as roleList,
 } from "@/lib/prompt"
+import { useEffect, useRef, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -34,6 +35,10 @@ import {
 } from "../ui/accordion"
 import { encode } from "@toon-format/toon"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition"
+import { Mic, StopCircle } from "lucide-react"
 
 const defaultRoleOptions: ComboboxOptions[] = roleList.map((role) => {
   return {
@@ -46,6 +51,8 @@ const exportOptions = ["xml", "json", "toon"] as const
 
 type ExportMode = (typeof exportOptions)[number]
 const defaultExportMode: ExportMode = "toon"
+
+type SpeechTarget = "context" | "task"
 
 function isExportMode(value: unknown): value is ExportMode {
   return (
@@ -120,7 +127,65 @@ const PromptForm = () => {
     },
   })
 
-  const { setValue } = form
+  const { setValue, getValues } = form
+
+  const [speechTarget, setSpeechTarget] = useState<SpeechTarget | null>(null)
+  const commitRef = useRef(false)
+
+  const {
+    transcript,
+    listening,
+    browserSupportsSpeechRecognition,
+    resetTranscript,
+  } = useSpeechRecognition()
+
+  useEffect(() => {
+    // Commit when recognition stops (either via the button or automatically).
+    if (listening) return
+    if (!speechTarget) return
+    if (commitRef.current) return
+
+    const spoken = transcript.trim()
+    if (spoken) {
+      const currentValue = getValues(speechTarget) ?? ""
+      const nextValue = currentValue.trim().length
+        ? `${currentValue.trimEnd()} ${spoken}`
+        : spoken
+
+      setValue(speechTarget, nextValue, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+    }
+
+    commitRef.current = true
+    resetTranscript()
+    setSpeechTarget(null)
+  }, [
+    getValues,
+    listening,
+    resetTranscript,
+    setSpeechTarget,
+    setValue,
+    speechTarget,
+    transcript,
+  ])
+
+  function handleStartSpeech(target: SpeechTarget) {
+    if (!browserSupportsSpeechRecognition) return
+
+    commitRef.current = false
+    setSpeechTarget(target)
+    resetTranscript()
+    SpeechRecognition.startListening({
+      continuous: false,
+      language: navigator.language || "en-US",
+    })
+  }
+
+  function handleStopSpeech() {
+    SpeechRecognition.stopListening()
+  }
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     const {
@@ -217,6 +282,11 @@ const PromptForm = () => {
             defaultRoleOptions={defaultRoleOptions}
             handleSelect={handleSelect}
             handleAppendGroup={handleAppendGroup}
+            browserSupportsSpeechRecognition={browserSupportsSpeechRecognition}
+            listening={listening}
+            speechTarget={speechTarget}
+            handleStartSpeech={handleStartSpeech}
+            handleStopSpeech={handleStopSpeech}
           />
 
           <div className="space-y-6">
@@ -252,11 +322,21 @@ function MainFormCard({
   defaultRoleOptions,
   handleSelect,
   handleAppendGroup,
+  browserSupportsSpeechRecognition,
+  listening,
+  speechTarget,
+  handleStartSpeech,
+  handleStopSpeech,
 }: {
   form: UseFormReturn<z.infer<typeof formSchema>>
   defaultRoleOptions: ComboboxOptions[]
   handleSelect: (option: ComboboxOptions) => void
   handleAppendGroup: (label: ComboboxOptions["label"]) => void
+  browserSupportsSpeechRecognition: boolean
+  listening: boolean
+  speechTarget: SpeechTarget | null
+  handleStartSpeech: (target: SpeechTarget) => void
+  handleStopSpeech: () => void
 }) {
   return (
     <Card>
@@ -306,10 +386,35 @@ function MainFormCard({
               <FormItem>
                 <FormLabel aria-label="Context">Context</FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder="e.g., We are building an e-commerce checkout flow, in React typescript with ShadCN as UI library"
-                    {...field}
-                  />
+                  <div className="flex gap-2 items-end">
+                    <Textarea
+                      placeholder="e.g., We are building an e-commerce checkout flow, in React typescript with ShadCN as UI library"
+                      className="flex-1"
+                      {...field}
+                    />
+                    {browserSupportsSpeechRecognition ? (
+                      <div className="pt-1">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          disabled={listening && speechTarget !== "context"}
+                          onClick={() =>
+                            listening && speechTarget === "context"
+                              ? handleStopSpeech()
+                              : handleStartSpeech("context")
+                          }
+                          aria-label="Speech to text for context"
+                        >
+                          {listening && speechTarget === "context" ? (
+                            <StopCircle className="size-4" />
+                          ) : (
+                            <Mic className="size-4" />
+                          )}
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -322,11 +427,35 @@ function MainFormCard({
               <FormItem>
                 <FormLabel aria-label="task">Task</FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder="e.g., Suggest a better user flow for the checkout process., Write a user story for the new mobile app feature."
-                    className="w-full resize-y"
-                    {...field}
-                  />
+                  <div className="flex gap-2 items-end">
+                    <Textarea
+                      placeholder="e.g., Suggest a better user flow for the checkout process., Write a user story for the new mobile app feature."
+                      className="flex-1 resize-y"
+                      {...field}
+                    />
+                    {browserSupportsSpeechRecognition ? (
+                      <div className="pt-1">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          disabled={listening && speechTarget !== "task"}
+                          onClick={() =>
+                            listening && speechTarget === "task"
+                              ? handleStopSpeech()
+                              : handleStartSpeech("task")
+                          }
+                          aria-label="Speech to text for task"
+                        >
+                          {listening && speechTarget === "task" ? (
+                            <StopCircle className="size-4" />
+                          ) : (
+                            <Mic className="size-4" />
+                          )}
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -409,8 +538,8 @@ function FlagsCard({
                 "label" in categoryObj
                   ? categoryObj.label
                   : "labels" in categoryObj
-                  ? categoryObj.labels
-                  : categoryKey
+                    ? categoryObj.labels
+                    : categoryKey
               const flagEntries = Object.entries(categoryObj.flags)
               return (
                 <AccordionItem value={categoryKey} key={categoryKey}>
