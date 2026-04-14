@@ -44,6 +44,11 @@ export const flags = {
         prompt:
           "Give me just the code, no extra explanations or text. But make sure the code is formatted as such.",
       },
+      comments: {
+        label: "Include comments",
+        prompt:
+          "Include comments in the code to explain the code and the logic. Make sure the comments are clear and concise.",
+      },
     },
   },
   ux: {
@@ -93,6 +98,8 @@ type Prompt = {
     code: {
       production: boolean
       accessibility: boolean
+      onlyReturnCode: boolean
+      comments: boolean
     }
     ux: {
       rationale: boolean
@@ -151,6 +158,12 @@ export function generatePrompt(prompt: Prompt) {
   }
   if (prompt.flags.ux.accessibility) {
     flagStrings.push(flags.ux.flags.accessibility.prompt)
+  }
+  if (prompt.flags.code.onlyReturnCode) {
+    flagStrings.push(flags.code.flags.onlyReturnCode.prompt)
+  }
+  if (prompt.flags.code.comments) {
+    flagStrings.push(flags.code.flags.comments.prompt)
   }
   if (prompt.flags.promptEngineering.optimization) {
     flagStrings.push(flags.promptEngineering.flags.optimization.prompt)

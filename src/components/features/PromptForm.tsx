@@ -79,6 +79,7 @@ const formSchema = z.object({
       production: z.boolean(),
       accessibility: z.boolean(),
       onlyReturnCode: z.boolean(),
+      comments: z.boolean(),
     }),
     ux: z.object({
       rationale: z.boolean(),
@@ -113,6 +114,7 @@ const PromptForm = () => {
           production: true,
           accessibility: true,
           onlyReturnCode: false,
+          comments: true,
         },
         ux: {
           rationale: false,
@@ -186,7 +188,7 @@ const PromptForm = () => {
       // In production, the browser might block microphone access due to insecure
       // context (http vs https/localhost) or user denying permission.
       toast.error(
-        "Microphone is not available. Ensure you’re on HTTPS (or localhost) and microphone permission is granted."
+        "Microphone is not available. Ensure you’re on HTTPS (or localhost) and microphone permission is granted.",
       )
       requestedSpeechRef.current = false
       setSpeechTarget(null)
@@ -203,7 +205,7 @@ const PromptForm = () => {
     // Web Speech API typically requires a secure context (https or localhost).
     if (typeof window !== "undefined" && !window.isSecureContext) {
       toast.error(
-        "Speech recognition requires a secure context (HTTPS or localhost)."
+        "Speech recognition requires a secure context (HTTPS or localhost).",
       )
       requestedSpeechRef.current = false
       commitRef.current = true
@@ -219,7 +221,9 @@ const PromptForm = () => {
       language: navigator.language || "en-US",
     }).catch(() => {
       // Library swallows some errors; this is just a last resort to avoid silence.
-      toast.error("Could not start speech recognition. Check console for details.")
+      toast.error(
+        "Could not start speech recognition. Check console for details.",
+      )
     })
   }
 
@@ -596,6 +600,7 @@ function FlagsCard({
                           "flags.code.production",
                           "flags.code.accessibility",
                           "flags.code.onlyReturnCode",
+                          "flags.code.comments",
                           "flags.ux.rationale",
                           "flags.ux.bestPractices",
                           "flags.ux.accessibility",
